@@ -1,11 +1,13 @@
+
+//////////////////////////////
+// 🎮 VARIABLES GLOBALES
+//////////////////////////////
+
 let canvas;
 let ctx;
 
 let keys = {};
-document.addEventListener("keydown", e => keys[e.key] = true);
-document.addEventListener("keyup", e => keys[e.key] = false);
 
-// 🚚 camion
 let truck = {
   x: 100,
   y: 100,
@@ -15,71 +17,118 @@ let truck = {
 
 let money = 100;
 
-// 🏪 points
 const supplier = { x: 100, y: 100 };
-const depot = { x: 400, y: 250 };
 const client = { x: 650, y: 350 };
 
-// 🎨 choix couleur
+let gameStarted = false;
+
+//////////////////////////////
+// ⌨️ CONTROLES
+//////////////////////////////
+
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+//////////////////////////////
+// 🎨 SELECT COLOR
+//////////////////////////////
+
 function selectColor(color){
   truck.color = color;
 
   document.querySelectorAll(".colorBtn")
-    .forEach(b => b.classList.remove("selected"));
+    .forEach(btn => btn.classList.remove("selected"));
 
-  document.getElementById(color + "Btn")
-    ?.classList.add("selected");
+  const btn = document.getElementById(color + "Btn");
+  if (btn) btn.classList.add("selected");
 }
 
-// ▶ start game
+//////////////////////////////
+// ▶ START GAME
+//////////////////////////////
+
 function startGame(){
+
   document.getElementById("menu").style.display = "none";
+
+  canvas = document.getElementById("game");
   canvas.style.display = "block";
+
+  canvas.width = 800;
+  canvas.height = 500;
+
+  ctx = canvas.getContext("2d");
+
+  gameStarted = true;
+
   loop();
 }
 
-// 🔁 update UI
-function updateUI(){
-  document.getElementById("money").textContent = money;
+//////////////////////////////
+// 📏 DISTANCE
+//////////////////////////////
+
+function isNear(a, b){
+  return Math.hypot(a.x - b.x, a.y - b.y) < 40;
 }
 
-// 📏 distance
-function isNear(a,b){
-  return Math.hypot(a.x-b.x, a.y-b.y) < 40;
-}
+//////////////////////////////
+// 🎮 UPDATE
+//////////////////////////////
 
-// 🎮 update
 function update(){
+
+  if(!gameStarted) return;
 
   if(keys["ArrowUp"]) truck.y -= truck.speed;
   if(keys["ArrowDown"]) truck.y += truck.speed;
   if(keys["ArrowLeft"]) truck.x -= truck.speed;
   if(keys["ArrowRight"]) truck.x += truck.speed;
 
+  // 💰 gain simple
   if(isNear(truck, supplier) && keys[" "]){
     money += 1;
   }
 
-  updateUI();
+  // UI
+  document.getElementById("money").textContent = money;
 }
 
-// 🎨 draw
+//////////////////////////////
+// 🎨 DRAW
+//////////////////////////////
+
 function draw(){
+
+  if(!ctx) return;
+
   ctx.clearRect(0,0,800,500);
 
+  // fond debug
+  ctx.fillStyle = "#2b2b2b";
+  ctx.fillRect(0,0,800,500);
+
+  // supplier
   ctx.fillStyle = "green";
   ctx.fillRect(supplier.x-20, supplier.y-20, 40,40);
 
+  // client
   ctx.fillStyle = "blue";
   ctx.fillRect(client.x-20, client.y-20, 40,40);
 
+  // truck
   ctx.fillStyle = truck.color;
   ctx.fillRect(truck.x-10, truck.y-10, 20,20);
 }
 
-// 🔁 loop
+//////////////////////////////
+// 🔁 LOOP
+//////////////////////////////
+
 function loop(){
+
   update();
   draw();
+
   requestAnimationFrame(loop);
 }
