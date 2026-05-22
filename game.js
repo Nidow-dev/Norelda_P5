@@ -6,6 +6,8 @@
 let canvas;
 let ctx;
 
+let gameStarted = false;
+
 let keys = {};
 
 let truck = {
@@ -20,24 +22,28 @@ let money = 100;
 const supplier = { x: 100, y: 100 };
 const client = { x: 650, y: 350 };
 
-let gameStarted = false;
-
 //////////////////////////////
-// ⌨️ CONTROLES
+// ⌨️ INPUT CLAVIER
 //////////////////////////////
 
-document.addEventListener("keydown", e => keys[e.key] = true);
-document.addEventListener("keyup", e => keys[e.key] = false);
+document.addEventListener("keydown", (e) => {
+  keys[e.key] = true;
+});
+
+document.addEventListener("keyup", (e) => {
+  keys[e.key] = false;
+});
 
 //////////////////////////////
-// 🎨 SELECT COLOR
+// 🎨 CHOIX COULEUR
 //////////////////////////////
 
 function selectColor(color){
   truck.color = color;
 
-  document.querySelectorAll(".colorBtn")
-    .forEach(btn => btn.classList.remove("selected"));
+  document.querySelectorAll(".colorBtn").forEach(btn => {
+    btn.classList.remove("selected");
+  });
 
   const btn = document.getElementById(color + "Btn");
   if (btn) btn.classList.add("selected");
@@ -48,6 +54,8 @@ function selectColor(color){
 //////////////////////////////
 
 function startGame(){
+
+  console.log("PLAY CLICKED");
 
   document.getElementById("menu").style.display = "none";
 
@@ -73,7 +81,7 @@ function isNear(a, b){
 }
 
 //////////////////////////////
-// 🎮 UPDATE
+// 🎮 UPDATE LOGIQUE
 //////////////////////////////
 
 function update(){
@@ -85,12 +93,10 @@ function update(){
   if(keys["ArrowLeft"]) truck.x -= truck.speed;
   if(keys["ArrowRight"]) truck.x += truck.speed;
 
-  // 💰 gain simple
   if(isNear(truck, supplier) && keys[" "]){
     money += 1;
   }
 
-  // UI
   document.getElementById("money").textContent = money;
 }
 
@@ -104,11 +110,11 @@ function draw(){
 
   ctx.clearRect(0,0,800,500);
 
-  // fond debug
+  // fond
   ctx.fillStyle = "#2b2b2b";
   ctx.fillRect(0,0,800,500);
 
-  // supplier
+  // fournisseur
   ctx.fillStyle = "green";
   ctx.fillRect(supplier.x-20, supplier.y-20, 40,40);
 
@@ -116,7 +122,7 @@ function draw(){
   ctx.fillStyle = "blue";
   ctx.fillRect(client.x-20, client.y-20, 40,40);
 
-  // truck
+  // camion
   ctx.fillStyle = truck.color;
   ctx.fillRect(truck.x-10, truck.y-10, 20,20);
 }
