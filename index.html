@@ -48,7 +48,7 @@ button {
 
 <!-- 🎮 MENU -->
 <div id="menu">
-  <h1>🚚 Prototype Logistique</h1>
+  <h1>Norelda Roads</h1>
 
   <p>Choisis ton camion :</p>
 
@@ -64,7 +64,7 @@ button {
     ESPACE = action (acheter / livrer)
   </p>
 
-  <button onclick="startGame()" style="background:#4caf50;">▶ Jouer</button>
+  <button onclick="startGame()" style="background:#4caf50;">▶ PLAY</button>
 </div>
 
 <!-- 🎮 UI IN-GAME -->
@@ -95,12 +95,21 @@ let truck = {
   color: "red"
 };
 
-let money = 0;
+// 💰 joueur
+let money = 100;
 
-// 🏪 fournisseur
+// 📦 STOCK GLOBAL (ton dépôt)
+let storage = {
+  wheat: 0
+};
+
+// 🏪 FOURNISSEUR (achat)
 const supplier = { x: 100, y: 100 };
 
-// 🏙️ client
+// 🏠 DÉPÔT (stockage)
+const depot = { x: 400, y: 250 };
+
+// 🏙️ CLIENT (livraison)
 const client = { x: 650, y: 350 };
 
 // 🎨 sélection couleur
@@ -118,7 +127,7 @@ function startGame(){
 // UI
 function updateUI(){
   document.getElementById("money").textContent = money;
-  document.getElementById("wheat").textContent = truck.cargo;
+  document.getElementById("wheat").textContent = storage.wheat;
   document.getElementById("cap").textContent = truck.maxCargo;
 }
 
@@ -127,28 +136,40 @@ function isNear(a,b){
   return Math.hypot(a.x-b.x, a.y-b.y) < 40;
 }
 
-// update
+// 🎮 UPDATE
 function update(){
 
+  // déplacement
   if(keys["ArrowUp"]) truck.y -= truck.speed;
   if(keys["ArrowDown"]) truck.y += truck.speed;
   if(keys["ArrowLeft"]) truck.x -= truck.speed;
   if(keys["ArrowRight"]) truck.x += truck.speed;
 
-  // achat
+  // 🏪 ACHAT au fournisseur
   if(isNear(truck, supplier)){
     if(keys[" "]){
-      if(truck.cargo < truck.maxCargo){
-        truck.cargo++;
+      let price = 2;
+
+      if(money >= price && truck.cargo < truck.maxCargo){
+        money -= price;
+        truck.cargo += 1;
       }
     }
   }
 
-  // livraison
+  // 🏠 DÉPÔT (vider camion → stock)
+  if(isNear(truck, depot)){
+    if(keys[" "]){
+      storage.wheat += truck.cargo;
+      truck.cargo = 0;
+    }
+  }
+
+  // 🏙️ LIVRAISON client
   if(isNear(truck, client)){
     if(keys[" "]){
-      if(truck.cargo > 0){
-        truck.cargo--;
+      if(storage.wheat > 0){
+        storage.wheat -= 1;
         money += 10;
       }
     }
@@ -157,17 +178,24 @@ function update(){
   updateUI();
 }
 
-// draw
+// 🎨 DRAW
 function draw(){
   ctx.clearRect(0,0,800,500);
 
   // fournisseur
   ctx.fillStyle="green";
   ctx.fillRect(supplier.x-20, supplier.y-20, 40,40);
+  ctx.fillText("Fournisseur", supplier.x-40, supplier.y-30);
+
+  // dépôt
+  ctx.fillStyle="orange";
+  ctx.fillRect(depot.x-20, depot.y-20, 40,40);
+  ctx.fillText("Dépôt", depot.x-30, depot.y-30);
 
   // client
   ctx.fillStyle="blue";
   ctx.fillRect(client.x-20, client.y-20, 40,40);
+  ctx.fillText("Client", client.x-25, client.y-30);
 
   // camion
   ctx.fillStyle = truck.color;
