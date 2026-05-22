@@ -1,5 +1,5 @@
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+let canvas;
+let ctx;
 
 let keys = {};
 document.addEventListener("keydown", e => keys[e.key] = true);
