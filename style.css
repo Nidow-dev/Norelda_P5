@@ -31,7 +31,7 @@ canvas {
   text-align:center;
 }
 
-/* 🚚 boutons couleurs */
+/*  boutons couleurs */
 .colorContainer{
   display:flex;
   gap:20px;
